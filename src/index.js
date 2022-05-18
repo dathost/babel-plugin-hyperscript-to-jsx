@@ -79,6 +79,9 @@ const closeComponent = (jsxElem, children) => {
 };
 
 const injectChildren = (jsxElem, node) => {
+  if (isHyperscriptCall(node)) {
+    return closeComponent(jsxElem, [transformHyperscriptToJsx(node, false)]);
+  }
   if (t.isArrayExpression(node)) {
     return closeComponent(jsxElem, transformChildrenArray(node));
   }
