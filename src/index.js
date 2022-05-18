@@ -255,58 +255,6 @@ module.exports = declare(api => {
             );
           }
         });
-        let isReactDefaultImportInScope = false;
-        let reactImportNode = false;
-        let isReactImportIsInScope = false;
-        // Note that: Array.some is short circuit function, so will stop on a halfway if true is returned
-        path.node.body.some(arg => {
-          if (t.isImportDeclaration(arg)) {
-            isReactImportIsInScope = arg.source.value === "react";
-            reactImportNode = isReactImportIsInScope ? arg : false;
-            isReactDefaultImportInScope = arg.specifiers.some(
-              it =>
-                t.isImportDefaultSpecifier(it) &&
-                it.local.name === "React" &&
-                isReactImportIsInScope
-            );
-            return isReactImportIsInScope;
-          }
-          return false;
-        });
-        const shouldAddReactImport =
-          !isReactImportIsInScope && isHyperscriptInScope;
-        const shouldModifyReactImport =
-          isReactImportIsInScope &&
-          !isReactDefaultImportInScope &&
-          isHyperscriptInScope;
-        if (shouldModifyReactImport) {
-          reactImportNode.specifiers.unshift(
-            t.importDefaultSpecifier(t.identifier("React"))
-          );
-        } else if (shouldAddReactImport) {
-          path.node.body.unshift(
-            t.ImportDeclaration(
-              [t.ImportDefaultSpecifier(t.identifier("React"))],
-              t.StringLiteral("react")
-            )
-          );
-        }
-        // This is Revolut specific logic, ignore it :)
-        isCssModules = path.node.body.find(arg => {
-          if (t.isVariableDeclaration(arg)) {
-            return (
-              arg.declarations.find(
-                declaration => declaration.id.name === "hx"
-              ) || false
-            );
-          }
-          if (t.isImportDeclaration(arg)) {
-            return (
-              arg.specifiers.find(specifier => specifier.local.name === "hx") ||
-              false
-            );
-          }
-        });
       },
       CallExpression(path, state) {
         if (isHyperscriptInScope) {
