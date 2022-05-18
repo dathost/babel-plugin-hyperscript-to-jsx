@@ -20,14 +20,20 @@ const transformProps = props => {
         prop.value = t.JSXExpressionContainer(
           t.objectExpression(
             style.split(";").map((s) => {
-              const [key, val] = s.split(":");
+              let [key, val] = s.split(":");
+              key = key.trim();
+              val = val.trim();
+
               if (!key.trim()) {
                 return null;
               }
 
+              console.log(val);
               return t.objectProperty(
-                t.StringLiteral(key.trim().replace(/-./g, (x) => x[1].toUpperCase())),
-                t.StringLiteral(val.trim()),
+                t.stringLiteral(key.replace(/-./g, (x) => x[1].toUpperCase())),
+                val.endsWith('px') ?
+                  t.numericLiteral(parseFloat(val.split('px')[0]))
+                  : t.stringLiteral(val),
               )
             }).filter(Boolean)
           )
