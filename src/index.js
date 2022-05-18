@@ -192,9 +192,9 @@ const singleArgumentCase = firstArgument => {
 
 const twoArgumentsCase = (firstArg, secondArg, thirdArgIsAbsent) => {
   const jsxElem = singleArgumentCase(firstArg);
-  const isPropsObject = t.isObjectExpression(secondArg);
+  const isPropsObject = t.isObjectExpression(secondArg) || t.isNullLiteral(secondArg);
   if (isPropsObject) {
-    const props = bJsxAttributes(secondArg);
+    const props = t.isNullLiteral(secondArg) ? [] : bJsxAttributes(secondArg);
     const currentProps = jsxElem.openingElement.attributes;
     jsxElem.openingElement.attributes = [...currentProps, ...props];
     return jsxElem;
