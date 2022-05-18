@@ -148,7 +148,7 @@ const transformHyperscriptToJsx = (node, isTopLevelCall) => {
     case 3:
       return threeArgumentsCase(firstArgument, secondArg, thirdArg);
     default:
-      break;
+      return manyArgumentsCase(firstArgument, secondArg, node.arguments.slice(2));
   }
 };
 
@@ -210,6 +210,11 @@ const twoArgumentsCase = (firstArg, secondArg, thirdArgIsAbsent) => {
 const threeArgumentsCase = (firstArg, secondArg, thirdArg) => {
   const jsxElem = twoArgumentsCase(firstArg, secondArg, false);
   return injectChildren(jsxElem, thirdArg);
+};
+
+const manyArgumentsCase = (firstArg, secondArg, elements) => {
+  const jsxElem = twoArgumentsCase(firstArg, secondArg, false);
+  return closeComponent(jsxElem, transformChildrenArray({ elements }));
 };
 
 let isCssModules = false;
