@@ -8,6 +8,37 @@ const getOption = require("./utils").getOption;
 let isHyperscriptInScope = false;
 // utility functions that starts with b means build.
 
+const transformProps = props => {
+  for (const prop of props) {
+    if (prop.name.name === 'class') {
+      prop.name.name = 'className';
+    } else if (prop.name.name === 'for') {
+      prop.name.name = 'htmlFor';
+    } else if (prop.name.name === 'style') {
+      const style = prop.value.value;
+      if (typeof style === "string") {
+        prop.value = t.JSXExpressionContainer(
+          t.objectExpression(
+            style.split(";").map((s) => {
+              const [key, val] = s.split(":");
+              if (!key.trim()) {
+                return null;
+              }
+
+              return t.objectProperty(
+                t.StringLiteral(key.trim().replace(/-./g, (x) => x[1].toUpperCase())),
+                t.StringLiteral(val.trim()),
+              )
+            }).filter(Boolean)
+          )
+        );
+      }
+    }
+  }
+
+  return props
+}
+
 const isHyperscriptCall = node => {
   return t.isIdentifier(node.callee, {
     name: "h"
@@ -199,7 +230,7 @@ const twoArgumentsCase = (firstArg, secondArg, thirdArgIsAbsent) => {
   if (isPropsObject) {
     const props = t.isNullLiteral(secondArg) ? [] : bJsxAttributes(secondArg);
     const currentProps = jsxElem.openingElement.attributes;
-    jsxElem.openingElement.attributes = [...currentProps, ...props];
+    jsxElem.openingElement.attributes = [...currentProps, ...transformProps(props)];
     return jsxElem;
   }
   if (thirdArgIsAbsent) {
