@@ -28,7 +28,6 @@ const transformProps = props => {
                 return null;
               }
 
-              console.log(val);
               return t.objectProperty(
                 t.stringLiteral(key.replace(/-./g, (x) => x[1].toUpperCase())),
                 val.endsWith('px') ?
