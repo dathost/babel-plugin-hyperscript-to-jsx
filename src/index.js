@@ -21,8 +21,8 @@ const transformProps = props => {
           t.objectExpression(
             style.split(";").map((s) => {
               let [key, val] = s.split(":");
-              key = key.trim();
-              val = val.trim();
+              key = (key || "").trim();
+              val = (val || "").trim();
 
               if (!key.trim()) {
                 return null;
