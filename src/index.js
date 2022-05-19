@@ -30,7 +30,7 @@ const transformProps = props => {
 
               return t.objectProperty(
                 t.stringLiteral(key.replace(/-./g, (x) => x[1].toUpperCase())),
-                !val.includes(' ') && val.endsWith('px') ?
+                !val.includes(' ') && !isNaN(val.split('px')[0]) ?
                   t.numericLiteral(parseFloat(val.split('px')[0]))
                   : t.stringLiteral(val),
               )
